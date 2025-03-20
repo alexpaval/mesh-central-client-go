@@ -8,6 +8,7 @@ _This project is for personal use and is not intended to be all encompassing. It
 
 * List / search devices
 * Meshrouter replacment (tcp port forward, udp support possible eventually)
+* Cross platform (Windows and Linux, macos not tested)
 
 ## Usage
 
