@@ -8,6 +8,7 @@ _This project is for personal use and is not intended to be all encompassing. It
 
 * List / search devices
 * Meshrouter replacment (tcp port forward, udp support possible eventually)
+* Connect to devices via SSH
 * Cross platform (Windows and Linux, macos not tested)
 
 ## Usage
@@ -28,6 +29,12 @@ $ mcc route -L 8080:127.0.0.1:80
 
 # Want to see all the devices?
 $ mcc ls
+
+# SSH directly to a device (supports interactive mode as well)
+$ mcc ssh -i <nodeid>
+
+# SSH to a device that the mesh node can see but doesn't have a nodeid (useful for network devices)
+$ mcc ssh user@192.168.1.1 -i <nodeid>
 ```
 
 ### Explaining the Port Forward
@@ -40,6 +47,20 @@ Usage is very similar to the `ssh` command (thats why the flag is `-L`). The for
 |    |         |--- Destination port
 |    |------------- Destination IP (optional, can be excluded)
 |------------------ Local port (also optional, random port will be assigned)
+```
+
+## Contribute / Build
+
+This project leverages devbox. To start a development shell:
+
+```bash
+$ devbox shell
+```
+
+To build the project, run:
+
+```bash
+$ devbox run build-linux
 ```
 
 ## License

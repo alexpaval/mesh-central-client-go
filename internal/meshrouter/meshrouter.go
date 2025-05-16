@@ -68,6 +68,9 @@ func ApplySettings(remoteNodeId string, remotePort int, localPort int, remoteTar
 	settings.debug = debug
 }
 
+func GetLocalPort() int {
+	return settings.LocalPort
+}
 
 func StartSocket() {
 	p := config.GetDefaultProfile()
@@ -334,14 +337,17 @@ func StopSocket() {
 	settings.WebSocket.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(1000, "all done"))
 }
 
-func StartRouter() {
+func StartRouter(ready chan struct{}) {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", settings.LocalPort))
 	if err != nil {
 		fmt.Printf("Unable to bind to local TCP port %d: %v\n", settings.LocalPort, err)
 		os.Exit(1)
 		return
 	}
+	settings.LocalPort = listener.Addr().(*net.TCPAddr).Port
+	defer listener.Close()
 
+	close(ready)
 	fmt.Printf("Redirecting local port %d to remote port %d.\n", listener.Addr().(*net.TCPAddr).Port, settings.RemotePort)
 	fmt.Println("Press ctrl-c to exit.")
 
@@ -354,7 +360,6 @@ func StartRouter() {
 
 		go onTcpClientConnected(conn)
 	}
-	select {}
 }
 
 func onTcpClientConnected(conn net.Conn) {

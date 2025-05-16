@@ -53,8 +53,8 @@ var routeCmd = &cobra.Command{
 			)
 		}
 
-		meshrouter.StartRouter()
-
+		ready := make(chan struct{})
+		meshrouter.StartRouter(ready)
 	},
 }
 
