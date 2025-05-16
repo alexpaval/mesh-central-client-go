@@ -67,10 +67,10 @@ func init() {
 }
 
 // parseBindAddress parses a bind address string in the format:
-// "localport:target:remoteport" or "localport:remoteport"
+// "localport:target:remoteport" or "localport:remoteport" or just "remoteport"
 func parseBindAddress(s string) (localPort int, target string, remotePort int, err error) {
 	// Define regex pattern to match both formats
-	pattern := `^(\d+)(?::([\w\.\-]+))?:(\d+)$`
+	pattern := `^(?:(\d+)(?::([\w\.\-]+))?:)?(\d+)$`
 	re := regexp.MustCompile(pattern)
 
 	matches := re.FindStringSubmatch(s)

@@ -342,7 +342,7 @@ func StartRouter() {
 		return
 	}
 
-	fmt.Printf("Redirecting local port %d to remote port %d.\n", settings.LocalPort, settings.RemotePort)
+	fmt.Printf("Redirecting local port %d to remote port %d.\n", listener.Addr().(*net.TCPAddr).Port, settings.RemotePort)
 	fmt.Println("Press ctrl-c to exit.")
 
 	for {
