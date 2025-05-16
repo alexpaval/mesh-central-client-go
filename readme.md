@@ -39,7 +39,7 @@ Usage is very similar to the `ssh` command (thats why the flag is `-L`). The for
 ^    ^         ^
 |    |         |--- Destination port
 |    |------------- Destination IP (optional, can be excluded)
-|------------------ Local port
+|------------------ Local port (also optional, random port will be assigned)
 ```
 
 ## License
