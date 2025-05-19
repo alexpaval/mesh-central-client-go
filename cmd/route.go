@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	//"github.com/spf13/viper"
 
-	"github.com/soarinferret/mcc/internal/meshrouter"
+	"github.com/soarinferret/mcc/internal/meshcentral"
 )
 
 var routeCmd = &cobra.Command{
@@ -29,7 +29,7 @@ var routeCmd = &cobra.Command{
 			return
 		}
 
-		meshrouter.ApplySettings(
+		meshcentral.ApplySettings(
 			nodeID,
 			remoteport,
 			localport,
@@ -37,14 +37,14 @@ var routeCmd = &cobra.Command{
 			debug,
 		)
 
-		meshrouter.StartSocket()
+		meshcentral.StartSocket()
 
 		if nodeID == "" {
-			devices := meshrouter.GetDevices()
+			devices := meshcentral.GetDevices()
 			filterAndSortDevices(&devices)
 			nodeID = searchDevices(&devices)
 
-			meshrouter.ApplySettings(
+			meshcentral.ApplySettings(
 				nodeID,
 				remoteport,
 				localport,
@@ -54,7 +54,7 @@ var routeCmd = &cobra.Command{
 		}
 
 		ready := make(chan struct{})
-		meshrouter.StartRouter(ready)
+		meshcentral.StartRouter(ready)
 	},
 }
 

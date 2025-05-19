@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	//"github.com/spf13/viper"
 
-	"github.com/soarinferret/mcc/internal/meshrouter"
+	"github.com/soarinferret/mcc/internal/meshcentral"
 )
 
 
@@ -39,7 +39,7 @@ var sshCmd = &cobra.Command{
 		// generate random local port num
 		localport := 0
 
-		meshrouter.ApplySettings(
+		meshcentral.ApplySettings(
 			nodeID,
 			remoteport,
 			localport,
@@ -47,14 +47,14 @@ var sshCmd = &cobra.Command{
 			debug,
 		)
 
-		meshrouter.StartSocket()
+		meshcentral.StartSocket()
 
 		if nodeID == "" {
-			devices := meshrouter.GetDevices()
+			devices := meshcentral.GetDevices()
 			filterAndSortDevices(&devices)
 			nodeID = searchDevices(&devices)
 
-			meshrouter.ApplySettings(
+			meshcentral.ApplySettings(
 				nodeID,
 				remoteport,
 				localport,
@@ -66,13 +66,13 @@ var sshCmd = &cobra.Command{
 		ready := make(chan struct{})
 
 		// start proxy
-		go meshrouter.StartRouter(ready)
+		go meshcentral.StartRouter(ready)
 
 		// wait for proxy to be ready
 		<-ready
 
 		// start ssh client
-		sshPort := meshrouter.GetLocalPort()
+		sshPort := meshcentral.GetLocalPort()
 		fmt.Printf("SSH into %s:%d via 127.0.0.1%d\n", target, remoteport, sshPort)
 		sshCmd := exec.Command(	"ssh", "-o", "ServerAliveInterval=60",
 								"-o", "ServerAliveCountMax=3",

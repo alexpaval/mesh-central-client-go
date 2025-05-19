@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/soarinferret/mcc/internal/meshrouter"
+	"github.com/soarinferret/mcc/internal/meshcentral"
 
 	"github.com/pterm/pterm"
 
@@ -20,7 +20,7 @@ var listCmd = &cobra.Command{
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		meshrouter.ApplySettings(
+		meshcentral.ApplySettings(
 			"",
 			0,
 			0,
@@ -28,10 +28,10 @@ var listCmd = &cobra.Command{
 			false,
 		)
 
-		meshrouter.StartSocket()
+		meshcentral.StartSocket()
 
-		d := meshrouter.GetDevices()
-		meshrouter.StopSocket()
+		d := meshcentral.GetDevices()
+		meshcentral.StopSocket()
 
 		filterAndSortDevices(&d)
 
@@ -46,7 +46,7 @@ var searchCmd = &cobra.Command{
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		meshrouter.ApplySettings(
+		meshcentral.ApplySettings(
 			"",
 			0,
 			0,
@@ -54,10 +54,10 @@ var searchCmd = &cobra.Command{
 			false,
 		)
 
-		meshrouter.StartSocket()
+		meshcentral.StartSocket()
 
-		d := meshrouter.GetDevices()
-		meshrouter.StopSocket()
+		d := meshcentral.GetDevices()
+		meshcentral.StopSocket()
 
 		filterAndSortDevices(&d)
 		nodeid := searchDevices(&d)
@@ -72,7 +72,7 @@ func init() {
 	rootCmd.AddCommand(searchCmd)
 }
 
-func filterAndSortDevices(d *[]meshrouter.Device){
+func filterAndSortDevices(d *[]meshcentral.Device){
 	// filter devices (remove offline devices)
 	devices := (*d)[:0]
 	for _, device := range *d {
@@ -89,7 +89,7 @@ func filterAndSortDevices(d *[]meshrouter.Device){
 }
 
 
-func searchDevices(d *[]meshrouter.Device) string {
+func searchDevices(d *[]meshcentral.Device) string {
 	var options []string
 
 	for i, device := range *d {
@@ -106,7 +106,7 @@ func searchDevices(d *[]meshrouter.Device) string {
 	return nodeid
 }
 
-func printDevices(d *[]meshrouter.Device){
+func printDevices(d *[]meshcentral.Device){
 	// print devices
 	listData := [][]string{}
 	listData = append(listData, []string{"Hostname", "Connect IP", "OS"})
