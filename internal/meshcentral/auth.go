@@ -65,8 +65,6 @@ func StartSocket() {
 		options.RawQuery += fmt.Sprintf("&key=%s", settings.LoginKey)
 	}*/
 
-
-
 	// replace meshrelay.ashx with control.ashx
 	urlStr := strings.Replace(settings.ServerURL, "meshrelay.ashx", "control.ashx", 1)
 
@@ -219,4 +217,17 @@ func handleServerAuthCommand(command map[string]interface{}) {
 	}
 
 	settings.WebChannel.WriteMessage(websocket.TextMessage, []byte(auth))
+}
+
+// another hacky thing
+func sendAuthCookie() {
+	settings.WebSocket.WriteMessage(websocket.TextMessage, []byte(`{"action":"authcookie"}`))
+
+	// when settings.ACookie is set, return
+	for {
+		if settings.ACookie != "" {
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
 }
