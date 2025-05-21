@@ -7,7 +7,6 @@ import (
 	"bufio"
 	"fmt"
 	"time"
-	"strings"
 	"net/http"
 	"net/url"
 	"crypto/tls"
