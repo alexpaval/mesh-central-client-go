@@ -30,7 +30,7 @@ func randomHex() (string, error) {
 }
 
 // test setting up websocket
-func StartShell() {
+func StartShell(protocol int) {
 	// get an authcookie
 	sendAuthCookie()
 
@@ -67,7 +67,7 @@ func StartShell() {
 	}
 
 	done := make(chan struct{})
-	go onShellWebSocket(wsConn, done)
+	go onShellWebSocket(wsConn, protocol, done)
 	<-done
 
 	if settings.debug {
@@ -75,7 +75,7 @@ func StartShell() {
 	}
 }
 
-func onShellWebSocket(wsConn *websocket.Conn, done chan struct{}) {
+func onShellWebSocket(wsConn *websocket.Conn, protocol int, done chan struct{}) {
 	if settings.debug {
 		fmt.Println("Websocket connected")
 	}
@@ -108,7 +108,7 @@ func onShellWebSocket(wsConn *websocket.Conn, done chan struct{}) {
 
 	go func() {
 		for range winch {
-			sendOptionsUpdate(wsConn)
+			sendOptionsUpdate(wsConn, protocol)
 		}
 	}()
 
@@ -138,9 +138,9 @@ func onShellWebSocket(wsConn *websocket.Conn, done chan struct{}) {
 					if settings.debug {
 						fmt.Println("Received 'c' message")
 					}
-					sendOptionsUpdate(wsConn)
+					sendOptionsUpdate(wsConn, protocol)
 
-					if err := wsConn.WriteMessage(websocket.TextMessage, []byte("1")); err != nil {
+					if err := wsConn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("%d", protocol))); err != nil {
 						fmt.Println("Error sending 'c' response:", err)
 						return
 					}
@@ -186,11 +186,11 @@ func onShellWebSocket(wsConn *websocket.Conn, done chan struct{}) {
 
 }
 
-func sendOptionsUpdate(wsConn *websocket.Conn) {
+func sendOptionsUpdate(wsConn *websocket.Conn, protocol int) {
 	fd := int(os.Stdout.Fd())
 	cols, rows, _ := term.GetSize(fd)
 
-	if err := wsConn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf(`{"protocol":1,"cols":%d,"rows":%d,"xterm":true,"type":"options"}`,cols, rows))); err != nil {
+	if err := wsConn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf(`{"protocol":%d,"cols":%d,"rows":%d,"xterm":true,"type":"options"}`,protocol, cols, rows))); err != nil {
 		fmt.Println("Error sending options message:", err)
 		return
 	}

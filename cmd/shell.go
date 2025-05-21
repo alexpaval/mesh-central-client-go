@@ -2,7 +2,6 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
 	//"github.com/spf13/viper"
 
@@ -18,6 +17,7 @@ var shellCmd = &cobra.Command{
 
 		nodeID, _ := cmd.Flags().GetString("nodeid")
 		debug, _ := cmd.Flags().GetBool("debug")
+		powershell, _ := cmd.Flags().GetBool("powershell")
 
 
 		meshcentral.ApplySettings(
@@ -47,8 +47,11 @@ var shellCmd = &cobra.Command{
 		//ready := make(chan struct{})
 
 		// open shell
-		fmt.Println("not implemented yet")
-		meshcentral.StartShell()
+		protocol := 1
+		if powershell {
+			protocol = 6
+		}
+		meshcentral.StartShell(protocol)
 
 		meshcentral.StopSocket()
 
@@ -59,4 +62,5 @@ func init() {
 
 	shellCmd.Flags().StringP("nodeid", "i", "", "Mesh Central Node ID")
 	shellCmd.Flags().BoolP("debug", "", false, "Enable debug logging")
+	shellCmd.Flags().BoolP("powershell", "p", false, "Use powershell instead of cmd.exe (windows agents only")
 }
