@@ -7,6 +7,7 @@ import (
 	"bufio"
 	"fmt"
 	"time"
+	"strings"
 	"net/http"
 	"net/url"
 	"crypto/tls"
@@ -46,10 +47,6 @@ func StartShell() {
 	if err != nil {
 		fmt.Println("Unable to parse server URL:", err)
 		return
-	}
-
-	if settings.debug {
-		fmt.Println("Websocket URL:", wsUrl.String())
 	}
 
 	// set up headers
@@ -127,12 +124,12 @@ func onShellWebSocket(wsConn *websocket.Conn, done chan struct{}) {
 					if settings.debug {
 						fmt.Println("Server closed connection")
 					}
-					close(done)
-					return
-
+				}else{
+					fmt.Println("Error reading message:", err)
 				}
-				fmt.Println("Error reading message:", err)
-				break
+				term.Restore(int(os.Stdin.Fd()), oldState)
+				close(done)
+				return
 			}
 
 			// if json, handle it
@@ -142,8 +139,6 @@ func onShellWebSocket(wsConn *websocket.Conn, done chan struct{}) {
 					if settings.debug {
 						fmt.Println("Received 'c' message")
 					}
-
-					// todo: get actual terminal size
 					sendOptionsUpdate(wsConn)
 
 					if err := wsConn.WriteMessage(websocket.TextMessage, []byte("1")); err != nil {
@@ -156,6 +151,8 @@ func onShellWebSocket(wsConn *websocket.Conn, done chan struct{}) {
 			} else {
 				// print the binary message
 				os.Stdout.Write(msg)
+				// write the message to stdout as hex
+				//fmt.Printf("Received message: %x\n", msg)
 			}
 
 		}
