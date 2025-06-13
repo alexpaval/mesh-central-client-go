@@ -33,6 +33,9 @@ $ mcc ls
 # SSH directly to a device (supports interactive mode as well)
 $ mcc ssh -i <nodeid>
 
+# SSH as a proxy, useful for VSCode remote development
+$ mcc ssh -i <nodeid> --proxy
+
 # SSH to a device that the mesh node can see but doesn't have a nodeid (useful for network devices)
 $ mcc ssh user@192.168.1.1 -i <nodeid>
 ```
