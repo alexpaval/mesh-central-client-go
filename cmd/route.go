@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"errors"
-	"regexp"
 	"fmt"
+	"regexp"
 	"strconv"
 
 	"github.com/spf13/cobra"
@@ -16,7 +16,7 @@ var routeCmd = &cobra.Command{
 	Use:     "route",
 	Aliases: []string{"r"},
 	Short:   "Forward TCP traffic to specified Node",
-	Long: ``,
+	Long:    ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		bindAddress, _ := cmd.Flags().GetString("bind-address")
@@ -39,19 +39,20 @@ var routeCmd = &cobra.Command{
 
 		meshcentral.StartSocket()
 
+		devices := meshcentral.GetDevices()
+
 		if nodeID == "" {
-			devices := meshcentral.GetDevices()
 			filterAndSortDevices(&devices)
 			nodeID = searchDevices(&devices)
-
-			meshcentral.ApplySettings(
-				nodeID,
-				remoteport,
-				localport,
-				target,
-				debug,
-			)
 		}
+
+		meshcentral.ApplySettings(
+			nodeID,
+			remoteport,
+			localport,
+			target,
+			debug,
+		)
 
 		ready := make(chan struct{})
 		meshcentral.StartRouter(ready)

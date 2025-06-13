@@ -1,4 +1,3 @@
-
 package cmd
 
 import (
@@ -6,17 +5,18 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
 	"github.com/spf13/cobra"
+
 	//"github.com/spf13/viper"
 
 	"github.com/soarinferret/mcc/internal/meshcentral"
 )
 
-
 var sshCmd = &cobra.Command{
-	Use:     "ssh [user][@target]",
-	Short:   "Shortcut to ssh into a node",
-	Long:    `Opens SSH connection with the OpenSSH Client to a node via the local proxy`,
+	Use:   "ssh [user][@target]",
+	Short: "Shortcut to ssh into a node",
+	Long:  `Opens SSH connection with the OpenSSH Client to a node via the local proxy`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		user := "root"
@@ -49,19 +49,20 @@ var sshCmd = &cobra.Command{
 
 		meshcentral.StartSocket()
 
+		devices := meshcentral.GetDevices()
+
 		if nodeID == "" {
-			devices := meshcentral.GetDevices()
 			filterAndSortDevices(&devices)
 			nodeID = searchDevices(&devices)
-
-			meshcentral.ApplySettings(
-				nodeID,
-				remoteport,
-				localport,
-				target,
-				debug,
-			)
 		}
+
+		meshcentral.ApplySettings(
+			nodeID,
+			remoteport,
+			localport,
+			target,
+			debug,
+		)
 
 		ready := make(chan struct{})
 
@@ -74,11 +75,11 @@ var sshCmd = &cobra.Command{
 		// start ssh client
 		sshPort := meshcentral.GetLocalPort()
 		fmt.Printf("SSH into %s:%d via 127.0.0.1%d\n", target, remoteport, sshPort)
-		sshCmd := exec.Command(	"ssh", "-o", "ServerAliveInterval=60",
-								"-o", "ServerAliveCountMax=3",
-							 	"-o", "StrictHostKeyChecking=no",
-								"-o", "UserKnownHostsFile=/dev/null",
-							 	fmt.Sprintf("-p%d", sshPort), fmt.Sprintf("%s@127.0.0.1", user),
+		sshCmd := exec.Command("ssh", "-o", "ServerAliveInterval=60",
+			"-o", "ServerAliveCountMax=3",
+			"-o", "StrictHostKeyChecking=no",
+			"-o", "UserKnownHostsFile=/dev/null",
+			fmt.Sprintf("-p%d", sshPort), fmt.Sprintf("%s@127.0.0.1", user),
 		)
 		sshCmd.Stdout = os.Stdout
 		sshCmd.Stderr = os.Stderr
@@ -88,9 +89,9 @@ var sshCmd = &cobra.Command{
 			fmt.Printf("Unable to start SSH client: %v\n", err)
 		}
 
-
 	},
 }
+
 func init() {
 	rootCmd.AddCommand(sshCmd)
 
