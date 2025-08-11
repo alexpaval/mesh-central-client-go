@@ -78,11 +78,7 @@ var sshCmd = &cobra.Command{
 
 			// start ssh client
 			sshPort := meshcentral.GetLocalPort()
-			targetDisplay := target
-			if targetDisplay == "" {
-				targetDisplay = "localhost"
-			}
-			fmt.Printf("SSH into %s:%d via 127.0.0.1:%d\n", targetDisplay, remoteport, sshPort)
+			fmt.Printf("SSH into %s:%d via 127.0.0.1:%d\n", target, remoteport, sshPort)
 			sshCmd := exec.Command("ssh", "-o", "ServerAliveInterval=60",
 				"-o", "ServerAliveCountMax=3",
 				"-o", "StrictHostKeyChecking=no",
