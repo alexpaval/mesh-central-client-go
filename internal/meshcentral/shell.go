@@ -1,19 +1,21 @@
 package meshcentral
 
 import (
+	"bufio"
+	"crypto/rand"
+	"crypto/tls"
+	"fmt"
+	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
-	"bufio"
-	"fmt"
 	"time"
-	"net/http"
-	"net/url"
-	"crypto/tls"
-	"crypto/rand"
+
 	//"encoding/json"
 	"encoding/hex"
 	"unicode/utf8"
+
 	"github.com/gorilla/websocket"
 	"golang.org/x/term"
 )
@@ -31,8 +33,8 @@ func randomHex() (string, error) {
 
 // test setting up websocket
 func StartShell(protocol int) {
-	// get an authcookie
-	sendAuthCookie()
+	// wait for server to be authenticated
+	<-settings.WebChannel
 
 	id, _ := randomHex()
 
@@ -50,7 +52,6 @@ func StartShell(protocol int) {
 
 	// set up headers
 	headers := http.Header{}
-
 
 	// set up websocket dialer
 	dialer := websocket.Dialer{
@@ -123,7 +124,7 @@ func onShellWebSocket(wsConn *websocket.Conn, protocol int, done chan struct{}) 
 					if settings.debug {
 						fmt.Println("Server closed connection")
 					}
-				}else{
+				} else {
 					fmt.Println("Error reading message:", err)
 				}
 				term.Restore(int(os.Stdin.Fd()), oldState)
@@ -190,7 +191,7 @@ func sendOptionsUpdate(wsConn *websocket.Conn, protocol int) {
 	fd := int(os.Stdout.Fd())
 	cols, rows, _ := term.GetSize(fd)
 
-	if err := wsConn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf(`{"protocol":%d,"cols":%d,"rows":%d,"xterm":true,"type":"options"}`,protocol, cols, rows))); err != nil {
+	if err := wsConn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf(`{"protocol":%d,"cols":%d,"rows":%d,"xterm":true,"type":"options"}`, protocol, cols, rows))); err != nil {
 		fmt.Println("Error sending options message:", err)
 		return
 	}

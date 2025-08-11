@@ -2,13 +2,13 @@ package meshcentral
 
 import (
 	"crypto/tls"
-	"strings"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -85,6 +85,7 @@ func StartSocket() {
 		fmt.Println("Connected to server.")
 	}
 
+	settings.WebChannel = make(chan struct{})
 	settings.WebSocket = conn
 	go onServerWebSocket(conn)
 
@@ -98,7 +99,7 @@ func StopSocket() {
 }
 
 func onServerWebSocket(conn *websocket.Conn) {
-	settings.WebChannel = conn
+	//settings.WebChannel = conn
 
 	for {
 		_, message, err := conn.ReadMessage()
@@ -172,12 +173,9 @@ func handleAuthCookieCommand(command map[string]interface{}) {
 		settings.ACookie = command["cookie"].(string)
 		settings.RCookie = command["rcookie"].(string)
 		settings.RenewCookieTimer = time.AfterFunc(10*time.Minute, func() {
-			settings.WebChannel.WriteMessage(websocket.TextMessage, []byte(`{"action":"authcookie"}`))
+			settings.WebSocket.WriteMessage(websocket.TextMessage, []byte(`{"action":"authcookie"}`))
 		})
-		//startRouterEx()
-
-
-
+		close(settings.WebChannel)
 	} else {
 		settings.ACookie = command["cookie"].(string)
 		settings.RCookie = command["rcookie"].(string)
@@ -216,7 +214,7 @@ func handleServerAuthCommand(command map[string]interface{}) {
 		auth += "}"
 	}
 
-	settings.WebChannel.WriteMessage(websocket.TextMessage, []byte(auth))
+	settings.WebSocket.WriteMessage(websocket.TextMessage, []byte(auth))
 }
 
 // another hacky thing
