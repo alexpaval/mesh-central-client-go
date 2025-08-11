@@ -216,16 +216,3 @@ func handleServerAuthCommand(command map[string]interface{}) {
 
 	settings.WebSocket.WriteMessage(websocket.TextMessage, []byte(auth))
 }
-
-// another hacky thing
-func sendAuthCookie() {
-	settings.WebSocket.WriteMessage(websocket.TextMessage, []byte(`{"action":"authcookie"}`))
-
-	// when settings.ACookie is set, return
-	for {
-		if settings.ACookie != "" {
-			break
-		}
-		time.Sleep(100 * time.Millisecond)
-	}
-}
